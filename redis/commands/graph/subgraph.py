@@ -20,9 +20,36 @@ class Subgraph:
                     edges, set) or isinstance(edges, frozenset)):
                 raise TypeError("edges must be list, set, or frozenset")
 
-        self._nodes = frozenset(nodes or [])
-        self._edges = frozenset(edges or [])
-        self._nodes |= frozenset(chain.from_iterable(e.nodes() for e in self._edges))
+        _nodes = frozenset(nodes or [])
+        _edges = frozenset(edges or [])
+        _nodes |= frozenset(chain.from_iterable(e.nodes() for e in _edges))
+        self._nodes = self.__clean_nodes(_nodes)
+        self._edges = self.__clean_edges(self._nodes, _edges)
+
+    def __clean_nodes(self, nodes):
+        result = []
+        for node in nodes:
+            if not isinstance(node, int):
+                result.append(node)
+        return frozenset(result)
+
+    def __clean_edges(self, nodes, edges):
+        node_map = self.__build_node_map(nodes)
+        result = []
+        for edge in edges:
+            if isinstance(edge.src_node, int) and edge.src_node in node_map:
+                edge.src_node = node_map[edge.src_node]
+            if isinstance(edge.dest_node, int) and edge.dest_node in node_map:
+                edge.dest_node = node_map[edge.dest_node]
+            result.append(edge)
+        return frozenset(result)
+
+    def __build_node_map(self, nodes):
+        result = dict()
+        for node in nodes:
+            if node.id is not None:
+                result[node.id] = node
+        return result
 
     def nodes(self):
         return self._nodes
