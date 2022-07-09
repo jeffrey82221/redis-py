@@ -3,6 +3,7 @@ from .commands import GraphCommands
 from .edge import Edge  # noqa
 from .node import Node  # noqa
 from .path import Path  # noqa
+from .subgraph import Subgraph  # noqa
 
 
 class Graph(GraphCommands):

@@ -1,7 +1,6 @@
 import pytest
 
-from redis.commands.graph import edge, node, path
-from redis.commands.graph.subgraph import Subgraph
+from redis.commands.graph import edge, node, path, subgraph
 
 
 @pytest.mark.redismod
@@ -98,5 +97,6 @@ def test_to_subgraph():
     node2 = node.Node(node_id=2)
     edge1 = edge.Edge(node1, None, node2)
     this_path = path.Path(nodes=[node1, node2], edges=[edge1])
-    assert isinstance(this_path.to_subgraph(), Subgraph)
-    assert this_path.to_subgraph() == Subgraph(nodes=[node1, node2], edges=[edge1])
+    assert isinstance(this_path.to_subgraph(), subgraph.Subgraph)
+    assert this_path.to_subgraph() == subgraph.Subgraph(
+        nodes=[node1, node2], edges=[edge1])

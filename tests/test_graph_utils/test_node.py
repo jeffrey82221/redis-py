@@ -1,7 +1,6 @@
 import pytest
 
-from redis.commands.graph import node
-from redis.commands.graph.subgraph import Subgraph
+from redis.commands.graph import node, subgraph
 
 
 @pytest.fixture
@@ -120,5 +119,5 @@ def test_hash():
 @pytest.mark.redismod
 def test_to_subgraph():
     node1 = node.Node(node_id=1)
-    assert isinstance(node1.to_subgraph(), Subgraph)
-    assert node1.to_subgraph() == Subgraph(nodes=[node1])
+    assert isinstance(node1.to_subgraph(), subgraph.Subgraph)
+    assert node1.to_subgraph() == subgraph.Subgraph(nodes=[node1])
