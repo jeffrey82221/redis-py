@@ -50,7 +50,7 @@ class Subgraph:
     def __str__(self):
         res = ''
         if self._nodes:
-            res += 'Nodes:\n'
+            res += '\nNodes:\n'
             nodes_res = []
             for n in self._nodes:
                 nodes_res.append(str(n))
