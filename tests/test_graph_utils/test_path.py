@@ -92,6 +92,31 @@ def test_compare():
 
 
 @pytest.mark.redismod
+def test_union():
+    node1 = node.Node(node_id=1)
+    node2 = node.Node(node_id=2)
+    edge1 = edge.Edge(node1, None, node2)
+    subgraph1 = subgraph.Subgraph(nodes=[node1, node2], edges=[edge1])
+    # path1 | other object
+    assert path.Path([], []) | node1 == subgraph.Subgraph(nodes=[node1])
+    assert path.Path([], []) | edge1 == subgraph.Subgraph(edges=[edge1])
+    assert path.Path([], []) | path.Path([], []) == subgraph.Subgraph()
+    assert path.Path([], []) | subgraph1 == subgraph1
+    path1 = path.Path([node1, node2], [edge1])
+    assert path1 | node1 == subgraph.Subgraph(nodes=[node1, node2], edges=[edge1])
+    assert path1 | edge1 == subgraph.Subgraph(nodes=[node1, node2], edges=[edge1])
+    assert path1 | path1 == subgraph.Subgraph(nodes=[node1, node2], edges=[edge1])
+    assert path1 | path.Path(
+        [],
+        []) == subgraph.Subgraph(
+        nodes=[
+            node1,
+            node2],
+        edges=[edge1])
+    assert path1 | subgraph1 == subgraph.Subgraph(nodes=[node1, node2], edges=[edge1])
+
+
+@pytest.mark.redismod
 def test_to_subgraph():
     node1 = node.Node(node_id=1)
     node2 = node.Node(node_id=2)

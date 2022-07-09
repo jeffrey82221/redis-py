@@ -1,6 +1,6 @@
 import pytest
 
-from redis.commands.graph import edge, node, subgraph
+from redis.commands.graph import edge, node, path, subgraph
 
 
 @pytest.mark.redismod
@@ -147,3 +147,39 @@ def test_compare():
         edges=[edge1]) == subgraph.Subgraph(
         nodes=[node2],
         edges=[edge1])
+
+
+@pytest.mark.redismod
+def test_union():
+    node1 = node.Node(node_id=1)
+    node2 = node.Node(node_id=2)
+    node3 = node.Node(node_id=3)
+    edge1 = edge.Edge(node1, None, node2)
+    edge2 = edge.Edge(node1, None, node3)
+    path1 = path.Path([node1, node2], [edge1])
+    edge4 = edge.Edge(node2, None, node3)
+    path2 = path.Path([node1, node2, node3], [edge1, edge4])
+    subgraph1 = subgraph.Subgraph(nodes=[node1, node2], edges=[edge1])
+    # subgraph1 | other object
+    assert subgraph1 | node1 == subgraph1
+    assert subgraph1 | node3 == subgraph.Subgraph(
+        nodes=[node1, node2, node3], edges=[edge1])
+    assert subgraph1 | edge1 == subgraph1
+    assert subgraph1 | edge2 == subgraph.Subgraph(
+        nodes=[
+            node1, node2, node3], edges=[
+            edge1, edge2])
+    assert subgraph1 | path.Path([], []) == subgraph1
+    assert subgraph1 | path1 == subgraph1
+    assert subgraph1 | path2 == subgraph.Subgraph(
+        nodes=[
+            node1, node2, node3], edges=[
+            edge1, edge4])
+    assert subgraph1 | subgraph1 == subgraph1
+    assert subgraph1 | subgraph.Subgraph(
+        nodes=[
+            node1, node2, node3], edges=[
+            edge1, edge4]) == subgraph.Subgraph(
+                nodes=[
+                    node1, node2, node3], edges=[
+                        edge1, edge4])

@@ -1,6 +1,6 @@
 import pytest
 
-from redis.commands.graph import node, subgraph
+from redis.commands.graph import node, edge, path, subgraph
 
 
 @pytest.fixture
@@ -114,6 +114,21 @@ def test_hash():
             properties={
                 "a": 10}))
     assert hash(node.Node()) != hash(node.Node(properties={"a": 10}))
+
+
+@pytest.mark.redismod
+def test_union():
+    # node1 | other object
+    node1 = node.Node(node_id=1)
+    node2 = node.Node(node_id=2)
+    assert node1 | node2 == subgraph.Subgraph(nodes=[node1, node2])
+    edge1 = edge.Edge(node1, None, node2)
+    assert node1 | edge1 == subgraph.Subgraph(nodes=[node1, node2], edges=[edge1])
+    subgraph1 = subgraph.Subgraph(nodes=[node1, node2], edges=[edge1])
+    assert node1 | subgraph1 == subgraph.Subgraph(nodes=[node1, node2], edges=[edge1])
+    assert node1 | path.Path([], []) == subgraph.Subgraph(nodes=[node1])
+    assert node1 | path.Path([node1, node2], [edge1]) == subgraph.Subgraph(
+        nodes=[node1, node2], edges=[edge1])
 
 
 @pytest.mark.redismod
