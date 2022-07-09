@@ -7,6 +7,7 @@ from .edge import Edge
 from .exceptions import VersionMismatchException
 from .node import Node
 from .path import Path
+from .subgraph import Subgraph
 
 LABELS_ADDED = "Labels added"
 NODES_CREATED = "Nodes created"
@@ -272,7 +273,7 @@ class QueryResult:
         return scalar
 
     def parse_profile(self, response):
-        self.result_set = [x[0 : x.index(",")].strip() for x in response]
+        self.result_set = [x[0: x.index(",")].strip() for x in response]
 
     # """Prints the data from the query response:
     #    1. First row result_set contains the columns names.
@@ -309,6 +310,17 @@ class QueryResult:
 
     def is_empty(self):
         return len(self.result_set) == 0
+
+    def to_subgraph(self):
+        subgraph = None
+        for record in self.result_set:
+            for item in record:
+                if type(item) in [Node, Edge, Path]:
+                    if subgraph is None:
+                        subgraph = item.to_subgraph()
+                    else:
+                        subgraph |= item
+        return subgraph
 
     @staticmethod
     def _get_value(prop, statistics):

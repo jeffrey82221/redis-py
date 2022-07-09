@@ -77,3 +77,6 @@ class Path:
     def __or__(self, rhs):
         return Subgraph(set(self.nodes()) | set(rhs.nodes()),
                         set(self.edges()) | set(rhs.edges()))
+
+    def to_subgraph(self):
+        return Subgraph(nodes=self._nodes, edges=self._edges)

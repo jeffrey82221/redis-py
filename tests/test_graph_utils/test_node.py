@@ -115,3 +115,10 @@ def test_hash():
             properties={
                 "a": 10}))
     assert hash(node.Node()) != hash(node.Node(properties={"a": 10}))
+
+
+@pytest.mark.redismod
+def test_to_subgraph():
+    node1 = node.Node(node_id=1)
+    assert isinstance(node1.to_subgraph(), Subgraph)
+    assert node1.to_subgraph() == Subgraph(nodes=[node1])

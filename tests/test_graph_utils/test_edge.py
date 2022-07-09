@@ -1,6 +1,7 @@
 import pytest
 
 from redis.commands.graph import edge, node
+from redis.commands.graph.subgraph import Subgraph
 
 
 @pytest.mark.redismod
@@ -108,3 +109,12 @@ def test_hash():
     assert hash(edge1) != hash(edge.Edge(node3, None, node2))
     assert hash(edge1) != hash(edge.Edge(node2, None, node1))
     assert hash(edge1) != hash(edge.Edge(node1, None, node2, properties={"a": 10}))
+
+
+@pytest.mark.redismod
+def test_to_subgraph():
+    node1 = node.Node(node_id=1)
+    node2 = node.Node(node_id=2)
+    edge1 = edge.Edge(node1, None, node2)
+    assert isinstance(edge1.to_subgraph(), Subgraph)
+    assert edge1.to_subgraph() == Subgraph(edges=[edge1])
