@@ -17,6 +17,24 @@ def test_init():
 
 
 @pytest.mark.redismod
+def test_nodes():
+    nodes = edge.Edge(node.Node(node_id=1), None, node.Node(node_id=2)).nodes()
+    assert nodes[0].id == 1
+    assert nodes[1].id == 2
+    nodes = edge.Edge(node.Node(node_id=2), None, node.Node(node_id=1)).nodes()
+    assert nodes[0].id == 2
+    assert nodes[1].id == 1
+
+
+@pytest.mark.redismod
+def test_edges():
+    this_edge = edge.Edge(node.Node(node_id=1), None, node.Node(node_id=2))
+    edges = this_edge.edges()
+    assert len(edges) == 1
+    assert edges[0] == this_edge
+
+
+@pytest.mark.redismod
 def test_to_string():
     props_result = edge.Edge(
         node.Node(), None, node.Node(), properties={"a": "a", "b": 10}
@@ -75,3 +93,18 @@ def test_comparision():
     assert edge1 != edge.Edge(node3, None, node2)
     assert edge1 != edge.Edge(node2, None, node1)
     assert edge1 != edge.Edge(node1, None, node2, properties={"a": 10})
+
+
+@pytest.mark.redismod
+def test_hash():
+    node1 = node.Node(node_id=1)
+    node2 = node.Node(node_id=2)
+    node3 = node.Node(node_id=3)
+
+    edge1 = edge.Edge(node1, None, node2)
+    assert hash(edge1) == hash(edge.Edge(node1, None, node2))
+    assert hash(edge1) != hash(edge.Edge(node1, "bla", node2))
+    assert hash(edge1) != hash(edge.Edge(node1, None, node3))
+    assert hash(edge1) != hash(edge.Edge(node3, None, node2))
+    assert hash(edge1) != hash(edge.Edge(node2, None, node1))
+    assert hash(edge1) != hash(edge.Edge(node1, None, node2, properties={"a": 10}))

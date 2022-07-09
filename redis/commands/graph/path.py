@@ -1,5 +1,6 @@
 from .edge import Edge
 from .node import Node
+from .subgraph import Subgraph
 
 
 class Path:
@@ -72,3 +73,7 @@ class Path:
         res += "(" + str(node_id) + ")"
         res += ">"
         return res
+
+    def __or__(self, rhs):
+        return Subgraph(set(self.nodes()) | set(rhs.nodes()),
+                        set(self.edges()) | set(rhs.edges()))

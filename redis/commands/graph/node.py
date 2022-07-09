@@ -1,4 +1,5 @@
 from ..helpers import quote_string
+from .subgraph import Subgraph
 
 
 class Node:
@@ -36,6 +37,12 @@ class Node:
             )
 
         self.properties = properties or {}
+
+    def nodes(self):
+        return [self]
+
+    def edges(self):
+        return []
 
     def to_string(self):
         res = ""
@@ -82,3 +89,13 @@ class Node:
             return False
 
         return True
+
+    def __hash__(self):
+        if isinstance(self.id, int):
+            return hash(str(self.id)) ^ hash(self.label) ^ hash(self.to_string())
+        else:
+            return hash(self.label) ^ hash(self.to_string())
+
+    def __or__(self, rhs):
+        return Subgraph(set(self.nodes()) | set(rhs.nodes()),
+                        set(self.edges()) | set(rhs.edges()))

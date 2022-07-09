@@ -1,5 +1,6 @@
 from ..helpers import quote_string
 from .node import Node
+from .subgraph import Subgraph
 
 
 class Edge:
@@ -21,6 +22,12 @@ class Edge:
         self.properties = properties or {}
         self.src_node = src_node
         self.dest_node = dest_node
+
+    def nodes(self):
+        return [self.src_node, self.dest_node]
+
+    def edges(self):
+        return [self]
 
     def to_string(self):
         res = ""
@@ -85,3 +92,17 @@ class Edge:
             return False
 
         return True
+
+    def __hash__(self):
+        value = hash(self.src_node) ^ hash(self.dest_node)
+        value ^= hash(f'{hash(self.src_node)}{hash(self.dest_node)}')
+        value ^= hash(self.relation)
+        value ^= hash(self.to_string())
+        if isinstance(self.id, int):
+            return value ^ hash(str(self.id))
+        else:
+            return value
+
+    def __or__(self, rhs):
+        return Subgraph(set(self.nodes()) | set(rhs.nodes()),
+                        set(self.edges()) | set(rhs.edges()))
